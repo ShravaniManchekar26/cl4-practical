@@ -29,11 +29,12 @@ B,1,1,8
 ## 🧠 Mapper Code (mapper.py)
 
 
+
+
+
 #!/usr/bin/env python
 import sys
-
 N = 2
-
 for line in sys.stdin:
     parts = line.strip().split(',')
     matrix, i, j, val = parts[0], int(parts[1]), int(parts[2]), int(parts[3])
