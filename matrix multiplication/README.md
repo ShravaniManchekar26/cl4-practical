@@ -1,12 +1,12 @@
-# Matrix Multiplication using Hadoop MapReduce
+# 🧮 Matrix Multiplication using Hadoop MapReduce
 
 ---
 
 ## 📂 Files
 
-* mapper.py
-* reducer.py
-* input.txt
+* mapper.py  
+* reducer.py  
+* input.txt  
 
 ---
 
@@ -28,30 +28,29 @@ B,1,1,8
 
 ## 🧠 Mapper Code (mapper.py)
 
-
-
-
-
+```python
 #!/usr/bin/env python
 import sys
+
 N = 2
+
 for line in sys.stdin:
     parts = line.strip().split(',')
     matrix, i, j, val = parts[0], int(parts[1]), int(parts[2]), int(parts[3])
 
     if matrix == 'A':
         for k in range(N):
-            print "%d,%d\tA,%d,%d" % (i, k, j, val)
+            print("%d,%d\tA,%d,%d" % (i, k, j, val))
     else:
         for k in range(N):
-            print "%d,%d\tB,%d,%d" % (k, j, i, val)
+            print("%d,%d\tB,%d,%d" % (k, j, i, val))
 ```
 
 ---
 
 ## 🧠 Reducer Code (reducer.py)
 
-
+```python
 #!/usr/bin/env python
 import sys
 
@@ -74,7 +73,7 @@ def process(key, values):
         if k in B:
             result += A[k] * B[k]
 
-    print "%s\t%d" % (key, result)
+    print("%s\t%d" % (key, result))
 
 for line in sys.stdin:
     key, val = line.strip().split('\t')
@@ -117,37 +116,50 @@ chmod +x mapper.py reducer.py
 ### Step 4: Upload to HDFS
 
 ```
-hdfs dfs -mkdir /input
-hdfs dfs -put input.txt /input
+hdfs dfs -mkdir /input2
+hdfs dfs -put input.txt /input2
 ```
 
 ### Step 5: Remove old output
 
 ```
-hdfs dfs -rm -r /output
+hdfs dfs -rm -r /output2
 ```
 
 ### Step 6: Run MapReduce
 
 ```
 hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
--input /input/input.txt \
--output /output \
+-files mapper.py,reducer.py \
 -mapper mapper.py \
--reducer reducer.py
+-reducer reducer.py \
+-input /input2 \
+-output /output2
 ```
 
 ### Step 7: View Output
 
 ```
-hdfs dfs -cat /output/part-00000
+hdfs dfs -cat /output2/part-00000
 ```
 
 ---
 
 ## 📌 Notes
 
-* Python 2 syntax is used (no brackets in print)
-* Matrix size assumed: 2 × 2
-* Mapper emits intermediate key-value pairs
-* Reducer computes final multiplication result
+* Matrix size is fixed to **2 × 2**  
+* Mapper generates intermediate key-value pairs  
+* Reducer performs multiplication and summation  
+* Ensure Python scripts are executable  
+* Compatible with Python 2 and Python 3  
+
+---
+
+## ✅ Expected Output
+
+```
+0,0    19
+0,1    22
+1,0    43
+1,1    50
+```
