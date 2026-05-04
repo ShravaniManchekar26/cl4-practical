@@ -13,81 +13,81 @@
 ## 📥 Input File (input.txt)
 
 ```
-A,0,0,1
-A,0,1,2
-A,1,0,3
-A,1,1,4
+101,Math,95
+101,English,88
+102,Math,72
+102,Science,68
+103,Math,55
 
-B,0,0,5
-B,0,1,6
-B,1,0,7
-B,1,1,8
 ```
 
 ---
 
 ## 🧠 Mapper Code (mapper.py)
-
-```python
 #!/usr/bin/env python
 import sys
 
-N = 2
-
 for line in sys.stdin:
-    parts = line.strip().split(',')
-    matrix, i, j, val = parts[0], int(parts[1]), int(parts[2]), int(parts[3])
+    line = line.strip()
+    parts = line.split(",")
 
-    if matrix == 'A':
-        for k in range(N):
-            print "%d,%d\tA,%d,%d" % (i, k, j, val)
-    else:
-        for k in range(N):
-            print "%d,%d\tB,%d,%d" % (k, j, i, val)
+    if len(parts) != 3:
+        continue
+
+    student_id, subject, marks = parts
+
+    try:
+        marks = float(marks)
+        print "%s\t%s" % (student_id, marks)
+    except:
+        continue
+
 ```
 
 ---
 
 ## 🧠 Reducer Code (reducer.py)
 
-```python
 #!/usr/bin/env python
 import sys
 
-current_key = None
-values = []
+current_student = None
+marks_list = []
 
-def process(key, values):
-    A = {}
-    B = {}
-
-    for val in values:
-        parts = val.split(',')
-        if parts[0] == 'A':
-            A[int(parts[1])] = int(parts[2])
-        else:
-            B[int(parts[1])] = int(parts[2])
-
-    result = 0
-    for k in A:
-        if k in B:
-            result += A[k] * B[k]
-
-    print "%s\t%d" % (key, result)
+def calculate_grade(avg):
+    if avg >= 90:
+        return "A"
+    elif avg >= 80:
+        return "B"
+    elif avg >= 70:
+        return "C"
+    elif avg >= 60:
+        return "D"
+    else:
+        return "F"
 
 for line in sys.stdin:
-    key, val = line.strip().split('\t')
+    line = line.strip()
+    student_id, marks = line.split("\t")
+    marks = float(marks)
 
-    if key == current_key:
-        values.append(val)
+    if current_student == student_id:
+        marks_list.append(marks)
     else:
-        if current_key:
-            process(current_key, values)
-        current_key = key
-        values = [val]
+        if current_student:
+            avg = sum(marks_list) / len(marks_list)
+            grade = calculate_grade(avg)
+            print "%s,%0.2f,%s" % (current_student, avg, grade)
 
-if current_key:
-    process(current_key, values)
+        current_student = student_id
+        marks_list = [marks]
+
+if current_student:
+    avg = sum(marks_list) / len(marks_list)
+    grade = calculate_grade(avg)
+    print "%s,%0.2f,%s" % (current_student, avg, grade)
+
+
 ```
 
 ---
